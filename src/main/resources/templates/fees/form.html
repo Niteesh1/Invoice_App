@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Book Issue</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <h1>New Book Issue</h1>
+            <p>Record book handover even when payment is pending.</p>
+        </div>
+    </div>
+    <form th:action="@{/fees}" th:object="${issueForm}" method="post" class="panel form-grid">
+        <div class="alert error" th:if="${#fields.hasGlobalErrors()}" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></div>
+        <label>
+            Class
+            <select th:field="*{selectedClass}" id="classSelect" required>
+                <option value="">Select class</option>
+                <option th:each="className : ${classOptions}" th:value="${className}" th:text="${className}">Class</option>
+            </select>
+            <span class="field-error" th:errors="*{selectedClass}"></span>
+        </label>
+        <label>
+            Search Student Name
+            <input id="studentSearch" type="search" placeholder="Select class first" autocomplete="off" disabled>
+        </label>
+        <label class="span-2">
+            Student
+            <select th:field="*{studentId}" id="studentSelect" required disabled>
+                <option value="">Select student</option>
+                <option th:each="student : ${students}"
+                        th:value="${student.id}"
+                        th:attr="data-class=${student.grade},data-name=${#strings.toLowerCase(student.name)}"
+                        th:text="${student.name + ' - ' + student.grade}">Student</option>
+            </select>
+            <span class="helper-text">Only students from the selected class will appear here.</span>
+            <span class="field-error" th:errors="*{studentId}"></span>
+        </label>
+        <label>
+            Issue Date
+            <input th:field="*{issueDate}" type="date" required>
+            <span class="field-error" th:errors="*{issueDate}"></span>
+        </label>
+        <label>
+            Book Title
+            <input th:field="*{bookTitle}" required>
+            <span class="field-error" th:errors="*{bookTitle}"></span>
+        </label>
+        <label>
+            Quantity
+            <input th:field="*{quantity}" type="number" min="1" required>
+            <span class="field-error" th:errors="*{quantity}"></span>
+        </label>
+        <label>
+            Unit Price
+            <input th:field="*{unitPrice}" type="number" min="0" step="0.01" required>
+            <span class="field-error" th:errors="*{unitPrice}"></span>
+        </label>
+        <label>
+            Discount
+            <input th:field="*{discount}" type="number" min="0" step="0.01" required>
+            <span class="field-error" th:errors="*{discount}"></span>
+        </label>
+        <label class="span-2">
+            Remarks
+            <textarea th:field="*{remarks}" rows="3"></textarea>
+            <span class="field-error" th:errors="*{remarks}"></span>
+        </label>
+        <div class="actions span-2">
+            <a class="button secondary" th:href="@{/fees}">Cancel</a>
+            <button type="submit">Save Issue</button>
+        </div>
+    </form>
+</main>
+<script>
+    const classSelect = document.getElementById("classSelect");
+    const studentSearch = document.getElementById("studentSearch");
+    const studentSelect = document.getElementById("studentSelect");
+    const placeholder = studentSelect.querySelector("option[value='']");
+    const allStudentOptions = Array.from(studentSelect.querySelectorAll("option[data-class]"));
+    const initialStudentId = studentSelect.value;
+
+    function renderStudents() {
+        const selectedClass = classSelect.value;
+        const searchTerm = studentSearch.value.trim().toLowerCase();
+        const previousValue = studentSelect.value || initialStudentId;
+
+        studentSelect.innerHTML = "";
+        studentSelect.appendChild(placeholder.cloneNode(true));
+
+        const matchingStudents = allStudentOptions.filter((option) => {
+            const classMatches = option.dataset.class === selectedClass;
+            const nameMatches = !searchTerm || option.dataset.name.includes(searchTerm);
+            return classMatches && nameMatches;
+        });
+
+        matchingStudents.forEach((option) => studentSelect.appendChild(option.cloneNode(true)));
+
+        studentSearch.disabled = !selectedClass;
+        studentSelect.disabled = !selectedClass;
+        studentSearch.placeholder = selectedClass ? "Type student name" : "Select class first";
+
+        if (selectedClass && matchingStudents.some((option) => option.value === previousValue)) {
+            studentSelect.value = previousValue;
+        } else {
+            studentSelect.value = "";
+        }
+    }
+
+    classSelect.addEventListener("change", () => {
+        studentSearch.value = "";
+        studentSelect.value = "";
+        renderStudents();
+    });
+    studentSearch.addEventListener("input", renderStudents);
+    renderStudents();
+</script>
+</body>
+</html>

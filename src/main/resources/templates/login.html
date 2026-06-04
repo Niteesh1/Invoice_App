@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - Book Fee Collection</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="login-page">
+<main class="login-panel">
+    <h1>Book Fee Collection</h1>
+    <form th:action="@{/login}" method="post" class="stack">
+        <div class="alert error" th:if="${param.error}">Invalid username or password.</div>
+        <div class="alert success" th:if="${param.logout}">You have been logged out.</div>
+        <label>
+            Username
+            <input name="username" type="text" autocomplete="username" required autofocus>
+        </label>
+        <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">Sign in</button>
+    </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sales Report</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <h1>Sales Report</h1>
+            <p>Book issues recorded between selected dates.</p>
+        </div>
+        <button class="no-print" onclick="window.print()" type="button">Print</button>
+    </div>
+    <form class="toolbar no-print" th:action="@{/reports/sales}" method="get">
+        <input type="date" name="startDate" th:value="${startDate}">
+        <input type="date" name="endDate" th:value="${endDate}">
+        <button type="submit">Run Report</button>
+    </form>
+    <section class="panel">
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Student</th>
+                <th>Book</th>
+                <th class="number">Qty</th>
+                <th class="number">Due</th>
+                <th class="number">Balance</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="issue : ${issues}">
+                <td th:text="${issue.issueDate}">Date</td>
+                <td th:text="${issue.student.name}">Student</td>
+                <td th:text="${issue.bookTitle}">Book</td>
+                <td class="number" th:text="${issue.quantity}">1</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td><span th:class="'badge status-' + ${issue.status}" th:text="${issue.status}">PENDING</span></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(issues)}">
+                <td colspan="7" class="empty">No book issues for this period.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

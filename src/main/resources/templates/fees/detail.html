@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book Issue</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${issue.bookTitle}">Book</h1>
+            <p th:text="${issue.student.name + ' | ' + issue.issueDate}">Student</p>
+        </div>
+        <a class="button" th:if="${issue.balance.compareTo(T(java.math.BigDecimal).ZERO) > 0}" th:href="@{/payments/new(issueId=${issue.id})}">Record Payment</a>
+    </div>
+
+    <section class="metrics">
+        <div class="metric">
+            <span>Total Due</span>
+            <strong th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</strong>
+        </div>
+        <div class="metric">
+            <span>Collected</span>
+            <strong th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</strong>
+        </div>
+        <div class="metric">
+            <span>Balance</span>
+            <strong th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</strong>
+        </div>
+        <div class="metric">
+            <span>Status</span>
+            <strong><span th:class="'badge status-' + ${issue.status}" th:text="${issue.status}">PENDING</span></strong>
+        </div>
+    </section>
+
+    <section class="panel detail-grid">
+        <div><span>Student</span><strong th:text="${issue.student.name}">Student</strong></div>
+        <div><span>Class</span><strong th:text="${issue.student.grade}">Class</strong></div>
+        <div><span>Quantity</span><strong th:text="${issue.quantity}">1</strong></div>
+        <div><span>Unit Price</span><strong th:text="${#numbers.formatDecimal(issue.unitPrice, 1, 2)}">0.00</strong></div>
+        <div><span>Discount</span><strong th:text="${#numbers.formatDecimal(issue.discount, 1, 2)}">0.00</strong></div>
+        <div><span>Remarks</span><strong th:text="${issue.remarks} ?: '-'">-</strong></div>
+    </section>
+
+    <section class="panel">
+        <div class="section-header"><h2>Payment History</h2></div>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Receipt</th>
+                <th>Mode</th>
+                <th>By</th>
+                <th class="number">Amount</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="payment : ${issue.payments}">
+                <td th:text="${payment.paymentDate}">Date</td>
+                <td th:text="${payment.receiptNumber}">Receipt</td>
+                <td th:text="${payment.paymentMode}">Mode</td>
+                <td th:text="${payment.createdBy}">User</td>
+                <td class="number" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
+                <td><a th:href="@{/payments/{id}/receipt(id=${payment.id})}">Receipt</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(issue.payments)}">
+                <td colspan="6" class="empty">No payments recorded yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard - Book Fee Collection</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Daily collection, pending dues, and current payment status.</p>
+        </div>
+        <a class="button" th:href="@{/fees/new}">New Book Issue</a>
+    </div>
+
+    <section class="metrics">
+        <div class="metric">
+            <span>Today Collection</span>
+            <strong th:text="${#numbers.formatDecimal(stats.todayCollection, 1, 2)}">0.00</strong>
+        </div>
+        <div class="metric">
+            <span>Total Collection</span>
+            <strong th:text="${#numbers.formatDecimal(stats.totalCollection, 1, 2)}">0.00</strong>
+        </div>
+        <div class="metric">
+            <span>Pending Amount</span>
+            <strong th:text="${#numbers.formatDecimal(stats.pendingAmount, 1, 2)}">0.00</strong>
+        </div>
+        <div class="metric">
+            <span>Pending / Partial / Paid</span>
+            <strong th:text="${stats.pendingCount + ' / ' + stats.partialCount + ' / ' + stats.paidCount}">0 / 0 / 0</strong>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="section-header">
+            <h2>Old Pending Issues</h2>
+            <a th:href="@{/reports/pending}">View report</a>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Student</th>
+                <th>Book</th>
+                <th class="number">Balance</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="issue : ${oldPendingIssues}">
+                <td th:text="${issue.issueDate}">2026-06-03</td>
+                <td th:text="${issue.student.name}">Student</td>
+                <td th:text="${issue.bookTitle}">Book</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td><span th:class="'badge status-' + ${issue.status}" th:text="${issue.status}">PENDING</span></td>
+                <td><a th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(oldPendingIssues)}">
+                <td colspan="6" class="empty">No pending issues yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

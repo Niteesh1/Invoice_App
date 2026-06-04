@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${student.name}">Student</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${student.name}">Student</h1>
+            <p th:text="${student.grade + ' | ' + (student.contactNumber ?: 'No contact')}">Class</p>
+        </div>
+        <a class="button" th:href="@{/fees/new}">New Book Issue</a>
+    </div>
+
+    <section class="panel">
+        <div class="section-header"><h2>Ledger</h2></div>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Book</th>
+                <th class="number">Due</th>
+                <th class="number">Collected</th>
+                <th class="number">Balance</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="issue : ${issues}">
+                <td th:text="${issue.issueDate}">Date</td>
+                <td th:text="${issue.bookTitle}">Book</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td><span th:class="'badge status-' + ${issue.status}" th:text="${issue.status}">PENDING</span></td>
+                <td><a th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(issues)}">
+                <td colspan="7" class="empty">No book issues for this student yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <div class="section-header"><h2>Payment History</h2></div>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Receipt</th>
+                <th>Book</th>
+                <th>Mode</th>
+                <th class="number">Amount</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="payment : ${payments}">
+                <td th:text="${payment.paymentDate}">Date</td>
+                <td th:text="${payment.receiptNumber}">Receipt</td>
+                <td th:text="${payment.bookIssue.bookTitle}">Book</td>
+                <td th:text="${payment.paymentMode}">CASH</td>
+                <td class="number" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
+                <td><a th:href="@{/payments/{id}/receipt(id=${payment.id})}">Receipt</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(payments)}">
+                <td colspan="6" class="empty">No payments recorded.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

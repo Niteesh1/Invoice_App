@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pending Dues</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <h1>Pending Dues</h1>
+            <p>Unpaid and partially paid book issues.</p>
+        </div>
+        <button class="no-print" onclick="window.print()" type="button">Print</button>
+    </div>
+    <section class="panel">
+        <div class="section-header"><h2>Pending</h2></div>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Student</th>
+                <th>Class</th>
+                <th>Book</th>
+                <th class="number">Balance</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="issue : ${pendingIssues}">
+                <td th:text="${issue.issueDate}">Date</td>
+                <td th:text="${issue.student.name}">Student</td>
+                <td th:text="${issue.student.grade}">Class</td>
+                <td th:text="${issue.bookTitle}">Book</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td><a class="no-print" th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(pendingIssues)}">
+                <td colspan="6" class="empty">No pending issues.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+    <section class="panel">
+        <div class="section-header"><h2>Partial Paid</h2></div>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Student</th>
+                <th>Class</th>
+                <th>Book</th>
+                <th class="number">Balance</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="issue : ${partialIssues}">
+                <td th:text="${issue.issueDate}">Date</td>
+                <td th:text="${issue.student.name}">Student</td>
+                <td th:text="${issue.student.grade}">Class</td>
+                <td th:text="${issue.bookTitle}">Book</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td><a class="no-print" th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(partialIssues)}">
+                <td colspan="6" class="empty">No partial payments.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

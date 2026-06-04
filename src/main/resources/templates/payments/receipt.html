@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'Receipt ' + payment.receiptNumber}">Receipt</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="no-print" th:replace="~{fragments/nav :: nav}"></div>
+<main class="receipt-page">
+    <section class="receipt">
+        <header>
+            <div>
+                <h1>Payment Receipt</h1>
+                <p>Book Fee Collection</p>
+            </div>
+            <strong th:text="${payment.receiptNumber}">R20260603-0001</strong>
+        </header>
+        <dl>
+            <div><dt>Date</dt><dd th:text="${payment.paymentDate}">Date</dd></div>
+            <div><dt>Student</dt><dd th:text="${payment.bookIssue.student.name}">Student</dd></div>
+            <div><dt>Class</dt><dd th:text="${payment.bookIssue.student.grade}">Class</dd></div>
+            <div><dt>Book</dt><dd th:text="${payment.bookIssue.bookTitle}">Book</dd></div>
+            <div><dt>Mode</dt><dd th:text="${payment.paymentMode}">CASH</dd></div>
+            <div><dt>Received By</dt><dd th:text="${payment.createdBy}">admin</dd></div>
+        </dl>
+        <div class="receipt-total">
+            <span>Amount Paid</span>
+            <strong th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</strong>
+        </div>
+        <footer>
+            <span>Balance after payment</span>
+            <strong th:text="${#numbers.formatDecimal(payment.bookIssue.balance, 1, 2)}">0.00</strong>
+        </footer>
+    </section>
+    <div class="actions no-print">
+        <a class="button secondary" th:href="@{/fees/{id}(id=${payment.bookIssue.id})}">Back to Issue</a>
+        <button onclick="window.print()" type="button">Print Receipt</button>
+    </div>
+</main>
+</body>
+</html>

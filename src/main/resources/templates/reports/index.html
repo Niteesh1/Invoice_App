@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reports</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <h1>Reports</h1>
+            <p>Date-wise sales, collections, and pending dues.</p>
+        </div>
+    </div>
+    <section class="report-links">
+        <a class="report-link" th:href="@{/reports/collection}">
+            <strong>Daily Collection</strong>
+            <span>Payments received by payment date.</span>
+        </a>
+        <a class="report-link" th:href="@{/reports/sales}">
+            <strong>Daily Sales</strong>
+            <span>Book issues created by issue date.</span>
+        </a>
+        <a class="report-link" th:href="@{/reports/pending}">
+            <strong>Pending Dues</strong>
+            <span>Pending and partial balances.</span>
+        </a>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Student</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <h1>Add Student</h1>
+            <p>Student/customer details for fee records and ledger views.</p>
+        </div>
+    </div>
+    <form th:action="@{/students}" th:object="${student}" method="post" class="panel form-grid">
+        <label>
+            Name
+            <input th:field="*{name}" required>
+            <span class="field-error" th:errors="*{name}"></span>
+        </label>
+        <label>
+            Class / Grade
+            <select th:field="*{grade}" required>
+                <option value="">Select class</option>
+                <option th:each="className : ${classOptions}" th:value="${className}" th:text="${className}">Class</option>
+            </select>
+            <span class="field-error" th:errors="*{grade}"></span>
+        </label>
+        <label>
+            Contact Number
+            <input th:field="*{contactNumber}">
+            <span class="field-error" th:errors="*{contactNumber}"></span>
+        </label>
+        <label>
+            Address
+            <textarea th:field="*{address}" rows="3"></textarea>
+            <span class="field-error" th:errors="*{address}"></span>
+        </label>
+        <div class="actions">
+            <a class="button secondary" th:href="@{/students}">Cancel</a>
+            <button type="submit">Save Student</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

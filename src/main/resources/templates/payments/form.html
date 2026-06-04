@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Record Payment</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page narrow">
+    <div class="page-header">
+        <div>
+            <h1>Record Payment</h1>
+            <p th:text="${issue.student.name + ' | Balance: ' + #numbers.formatDecimal(issue.balance, 1, 2)}">Balance</p>
+        </div>
+    </div>
+    <form th:action="@{/payments}" th:object="${paymentForm}" method="post" class="panel form-grid">
+        <div class="alert error" th:if="${#fields.hasGlobalErrors()}" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></div>
+        <input type="hidden" th:field="*{bookIssueId}">
+        <label>
+            Payment Date
+            <input th:field="*{paymentDate}" type="date" required>
+            <span class="field-error" th:errors="*{paymentDate}"></span>
+        </label>
+        <label>
+            Amount
+            <input th:field="*{amount}" type="number" min="0.01" step="0.01" th:attr="max=${issue.balance}" required>
+            <span class="field-error" th:errors="*{amount}"></span>
+        </label>
+        <label>
+            Payment Mode
+            <select th:field="*{paymentMode}" required>
+                <option th:each="mode : ${paymentModes}" th:value="${mode}" th:text="${mode}">CASH</option>
+            </select>
+            <span class="field-error" th:errors="*{paymentMode}"></span>
+        </label>
+        <label>
+            Notes
+            <textarea th:field="*{notes}" rows="3"></textarea>
+            <span class="field-error" th:errors="*{notes}"></span>
+        </label>
+        <div class="actions span-2">
+            <a class="button secondary" th:href="@{/fees/{id}(id=${issue.id})}">Cancel</a>
+            <button type="submit">Record Payment</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

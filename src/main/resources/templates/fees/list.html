@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book Issues</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <h1>Book Issues</h1>
+            <p>Book handover, due amount, balance, and status.</p>
+        </div>
+        <a class="button" th:href="@{/fees/new}">New Book Issue</a>
+    </div>
+    <div class="alert success" th:if="${message}" th:text="${message}"></div>
+    <form class="toolbar" th:action="@{/fees}" method="get">
+        <input type="search" name="search" placeholder="Search student, class, or book" th:value="${search}">
+        <select name="status">
+            <option value="">All statuses</option>
+            <option th:each="status : ${statuses}"
+                    th:value="${status}"
+                    th:selected="${status == selectedStatus}"
+                    th:text="${status}">PENDING</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+    <section class="panel">
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Student</th>
+                <th>Book</th>
+                <th class="number">Due</th>
+                <th class="number">Collected</th>
+                <th class="number">Balance</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="issue : ${issues}">
+                <td th:text="${issue.issueDate}">Date</td>
+                <td th:text="${issue.student.name}">Student</td>
+                <td th:text="${issue.bookTitle}">Book</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</td>
+                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td><span th:class="'badge status-' + ${issue.status}" th:text="${issue.status}">PENDING</span></td>
+                <td><a th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(issues)}">
+                <td colspan="8" class="empty">No book issues found.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>

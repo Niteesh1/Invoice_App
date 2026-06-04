@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payments</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<main class="page">
+    <div class="page-header">
+        <div>
+            <h1>Payments</h1>
+            <p>Receipt history for all collected amounts.</p>
+        </div>
+    </div>
+    <div class="alert success" th:if="${message}" th:text="${message}"></div>
+    <section class="panel">
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Receipt</th>
+                <th>Student</th>
+                <th>Book</th>
+                <th>Mode</th>
+                <th class="number">Amount</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="payment : ${payments}">
+                <td th:text="${payment.paymentDate}">Date</td>
+                <td th:text="${payment.receiptNumber}">Receipt</td>
+                <td th:text="${payment.bookIssue.student.name}">Student</td>
+                <td th:text="${payment.bookIssue.bookTitle}">Book</td>
+                <td th:text="${payment.paymentMode}">CASH</td>
+                <td class="number" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
+                <td><a th:href="@{/payments/{id}/receipt(id=${payment.id})}">Receipt</a></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(payments)}">
+                <td colspan="7" class="empty">No payments recorded.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>
