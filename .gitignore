@@ -9,3 +9,7 @@ target/
 .env
 docs/
 BOOK_FEE_COLLECTION_REPO_STARTER.md
+sister-laptop-kit/
+scripts/
+src/main/resources/db/migration/V2__class_fee_configs.sql
+src/main/resources/db/migration/V3__merge_play_into_nursery.sql

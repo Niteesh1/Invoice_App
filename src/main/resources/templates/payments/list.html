@@ -16,7 +16,32 @@
         </div>
     </div>
     <div class="alert success" th:if="${message}" th:text="${message}"></div>
+    <form class="toolbar" th:action="@{/payments}" method="get">
+        <select name="grade">
+            <option value="">All classes</option>
+            <option th:each="className : ${classOptions}"
+                    th:value="${className}"
+                    th:selected="${className == selectedGrade}"
+                    th:text="${className}">Class</option>
+        </select>
+        <input type="date" name="startDate" th:value="${startDate}">
+        <input type="date" name="endDate" th:value="${endDate}">
+        <select name="sort">
+            <option value="dateDesc" th:selected="${selectedSort == 'dateDesc'}">Newest first</option>
+            <option value="dateAsc" th:selected="${selectedSort == 'dateAsc'}">Oldest first</option>
+            <option value="amountDesc" th:selected="${selectedSort == 'amountDesc'}">Amount high to low</option>
+            <option value="amountAsc" th:selected="${selectedSort == 'amountAsc'}">Amount low to high</option>
+            <option value="studentAsc" th:selected="${selectedSort == 'studentAsc'}">Student A-Z</option>
+            <option value="classAsc" th:selected="${selectedSort == 'classAsc'}">Class then student</option>
+        </select>
+        <button type="submit">Filter</button>
+        <a class="button secondary" th:href="@{/payments}">Clear</a>
+    </form>
     <section class="panel">
+        <div class="section-header">
+            <h2>Payment Results</h2>
+            <strong class="money amount-collected" th:text="${#numbers.formatDecimal(totalAmount, 1, 2)}">0.00</strong>
+        </div>
         <table>
             <thead>
             <tr>
@@ -31,13 +56,16 @@
             </thead>
             <tbody>
             <tr th:each="payment : ${payments}">
-                <td th:text="${payment.paymentDate}">Date</td>
-                <td th:text="${payment.receiptNumber}">Receipt</td>
-                <td th:text="${payment.bookIssue.student.name}">Student</td>
-                <td th:text="${payment.bookIssue.bookTitle}">Book</td>
-                <td th:text="${payment.paymentMode}">CASH</td>
-                <td class="number" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
-                <td><a th:href="@{/payments/{id}/receipt(id=${payment.id})}">Receipt</a></td>
+                <td><span class="date-pill" th:text="${payment.paymentDate}">Date</span></td>
+                <td><span class="receipt-chip" th:text="${payment.receiptNumber}">Receipt</span></td>
+                <td>
+                    <span class="student-name" th:text="${payment.bookIssue.student.name}">Student</span>
+                    <span class="class-chip compact" th:text="${payment.bookIssue.student.grade}">Class</span>
+                </td>
+                <td><span class="book-title" th:text="${payment.bookIssue.bookTitle}">Book</span></td>
+                <td><span class="mode-chip" th:text="${payment.paymentMode}">CASH</span></td>
+                <td class="number money amount-collected" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
+                <td><a class="row-action" th:href="@{/payments/{id}/receipt(id=${payment.id})}">Receipt</a></td>
             </tr>
             <tr th:if="${#lists.isEmpty(payments)}">
                 <td colspan="7" class="empty">No payments recorded.</td>

@@ -5,7 +5,6 @@ import java.util.List;
 public final class SchoolClassCatalog {
 
     public static final List<String> CLASS_OPTIONS = List.of(
-            "Play",
             "Nursery",
             "LKG",
             "UKG",

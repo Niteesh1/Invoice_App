@@ -20,16 +20,33 @@ public class StudentService {
 
     @Transactional(readOnly = true)
     public List<Student> findAll(String search) {
-        if (!StringUtils.hasText(search)) {
-            return studentRepository.findAllByOrderByNameAsc();
-        }
-        String term = search.trim();
-        return studentRepository.findByNameContainingIgnoreCaseOrGradeContainingIgnoreCaseOrderByNameAsc(term, term);
+        return findAll(search, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Student> findAll(String search, String grade) {
+        return findAll().stream()
+                .filter(student -> matchesGrade(student, grade))
+                .filter(student -> matchesSearch(student, search))
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public List<Student> findAll() {
         return studentRepository.findAllByOrderByNameAsc();
+    }
+
+    private boolean matchesSearch(Student student, String search) {
+        if (!StringUtils.hasText(search)) {
+            return true;
+        }
+        String term = search.trim().toLowerCase();
+        return student.getName().toLowerCase().contains(term)
+                || (student.getContactNumber() != null && student.getContactNumber().toLowerCase().contains(term));
+    }
+
+    private boolean matchesGrade(Student student, String grade) {
+        return !StringUtils.hasText(grade) || student.getGrade().equals(grade);
     }
 
     @Transactional(readOnly = true)
@@ -42,6 +59,17 @@ public class StudentService {
     public Student save(Student student) {
         normalize(student);
         return studentRepository.save(student);
+    }
+
+    @Transactional
+    public Student update(Long id, Student updatedStudent) {
+        Student existing = get(id);
+        existing.setName(updatedStudent.getName());
+        existing.setGrade(updatedStudent.getGrade());
+        existing.setContactNumber(updatedStudent.getContactNumber());
+        existing.setAddress(updatedStudent.getAddress());
+        normalize(existing);
+        return studentRepository.save(existing);
     }
 
     private void normalize(Student student) {

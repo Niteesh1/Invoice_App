@@ -1,10 +1,14 @@
 <nav class="top-nav" th:fragment="nav" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <a class="brand" th:href="@{/dashboard}">Book Fee Collection</a>
+    <a class="brand" th:href="@{/dashboard}">
+        <span>Nalanda E.M High School</span>
+        <small>Book Fee Collection</small>
+    </a>
     <div class="nav-links">
         <a th:href="@{/dashboard}">Dashboard</a>
         <a th:href="@{/students}">Students</a>
         <a th:href="@{/fees}">Book Issues</a>
         <a th:href="@{/payments}">Payments</a>
+        <a th:href="@{/book-fee-config}" sec:authorize="hasRole('ADMIN')">Fee Config</a>
         <a th:href="@{/reports}" sec:authorize="hasRole('ADMIN')">Reports</a>
     </div>
     <form th:action="@{/logout}" method="post">

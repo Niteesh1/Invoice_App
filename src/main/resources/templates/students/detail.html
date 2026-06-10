@@ -12,9 +12,15 @@
     <div class="page-header">
         <div>
             <h1 th:text="${student.name}">Student</h1>
-            <p th:text="${student.grade + ' | ' + (student.contactNumber ?: 'No contact')}">Class</p>
+            <p>
+                <span class="class-chip" th:text="${student.grade}">Class</span>
+                <span class="muted-value" th:text="${student.contactNumber ?: 'No contact'}">No contact</span>
+            </p>
         </div>
-        <a class="button" th:href="@{/fees/new}">New Book Issue</a>
+        <div class="actions">
+            <a class="button secondary" th:href="@{/students/{id}/edit(id=${student.id})}">Edit Student</a>
+            <a class="button" th:href="@{/fees/new(studentId=${student.id})}">New Book Issue</a>
+        </div>
     </div>
 
     <section class="panel">
@@ -33,13 +39,13 @@
             </thead>
             <tbody>
             <tr th:each="issue : ${issues}">
-                <td th:text="${issue.issueDate}">Date</td>
-                <td th:text="${issue.bookTitle}">Book</td>
-                <td class="number" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
-                <td class="number" th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</td>
-                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td><span class="date-pill" th:text="${issue.issueDate}">Date</span></td>
+                <td><span class="book-title" th:text="${issue.bookTitle}">Book</span></td>
+                <td class="number money amount-due" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
+                <td class="number money amount-collected" th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</td>
+                <td class="number money amount-balance" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
                 <td><span th:class="'badge status-' + ${issue.status}" th:text="${issue.status}">PENDING</span></td>
-                <td><a th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
+                <td><a class="row-action" th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
             </tr>
             <tr th:if="${#lists.isEmpty(issues)}">
                 <td colspan="7" class="empty">No book issues for this student yet.</td>
@@ -63,12 +69,12 @@
             </thead>
             <tbody>
             <tr th:each="payment : ${payments}">
-                <td th:text="${payment.paymentDate}">Date</td>
-                <td th:text="${payment.receiptNumber}">Receipt</td>
-                <td th:text="${payment.bookIssue.bookTitle}">Book</td>
-                <td th:text="${payment.paymentMode}">CASH</td>
-                <td class="number" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
-                <td><a th:href="@{/payments/{id}/receipt(id=${payment.id})}">Receipt</a></td>
+                <td><span class="date-pill" th:text="${payment.paymentDate}">Date</span></td>
+                <td><span class="receipt-chip" th:text="${payment.receiptNumber}">Receipt</span></td>
+                <td><span class="book-title" th:text="${payment.bookIssue.bookTitle}">Book</span></td>
+                <td><span class="mode-chip" th:text="${payment.paymentMode}">CASH</span></td>
+                <td class="number money amount-collected" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
+                <td><a class="row-action" th:href="@{/payments/{id}/receipt(id=${payment.id})}">Receipt</a></td>
             </tr>
             <tr th:if="${#lists.isEmpty(payments)}">
                 <td colspan="6" class="empty">No payments recorded.</td>

@@ -46,11 +46,17 @@ class BookFeeCollectionApplicationTests {
 
         mockMvc.perform(get("/reports").with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk());
+
+        mockMvc.perform(get("/book-fee-config").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void reportsRequireAdminRole() throws Exception {
+    void adminPagesRequireAdminRole() throws Exception {
         mockMvc.perform(get("/reports").with(user("cashier").roles("CASHIER")))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/book-fee-config").with(user("cashier").roles("CASHIER")))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/access-denied").with(user("cashier").roles("CASHIER")))

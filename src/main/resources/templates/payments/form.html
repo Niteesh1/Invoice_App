@@ -12,7 +12,7 @@
     <div class="page-header">
         <div>
             <h1>Record Payment</h1>
-            <p th:text="${issue.student.name + ' | Balance: ' + #numbers.formatDecimal(issue.balance, 1, 2)}">Balance</p>
+            <p th:text="${issue.student.name + ' | Balance: Rs. ' + #numbers.formatDecimal(issue.balance, 1, 2)}">Balance</p>
         </div>
     </div>
     <form th:action="@{/payments}" th:object="${paymentForm}" method="post" class="panel form-grid">
@@ -20,14 +20,20 @@
         <input type="hidden" th:field="*{bookIssueId}">
         <label>
             Payment Date
-            <input th:field="*{paymentDate}" type="date" required>
+            <input id="paymentDate" name="paymentDate" th:value="${paymentForm.paymentDate}" type="date" required>
+            <span class="helper-text">Defaults to today. Change only if recording an earlier payment.</span>
             <span class="field-error" th:errors="*{paymentDate}"></span>
         </label>
         <label>
             Amount
-            <input th:field="*{amount}" type="number" min="0.01" step="0.01" th:attr="max=${issue.balance}" required>
+            <input th:field="*{amount}" id="amount" type="number" min="0.01" step="0.01" th:attr="max=${issue.balance}" required>
             <span class="field-error" th:errors="*{amount}"></span>
         </label>
+        <section class="calculation-box span-2" th:attr="data-balance=${issue.balance}" id="paymentPreview" aria-live="polite">
+            <div><span>Current Balance</span><strong class="money" id="currentBalancePreview" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</strong></div>
+            <div><span>This Payment</span><strong class="money" id="paymentAmountPreview">0.00</strong></div>
+            <div><span>Balance After</span><strong class="money" id="balanceAfterPreview" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</strong></div>
+        </section>
         <label>
             Payment Mode
             <select th:field="*{paymentMode}" required>
@@ -46,5 +52,26 @@
         </div>
     </form>
 </main>
+<script>
+    const amountInput = document.getElementById("amount");
+    const paymentPreview = document.getElementById("paymentPreview");
+    const paymentAmountPreview = document.getElementById("paymentAmountPreview");
+    const balanceAfterPreview = document.getElementById("balanceAfterPreview");
+    const balance = Number.parseFloat(paymentPreview.dataset.balance || "0");
+
+    function money(value) {
+        return Number.isFinite(value) ? value.toFixed(2) : "0.00";
+    }
+
+    function renderPaymentPreview() {
+        const amount = Number.parseFloat(amountInput.value || "0");
+        const safeAmount = Number.isFinite(amount) ? amount : 0;
+        paymentAmountPreview.textContent = money(safeAmount);
+        balanceAfterPreview.textContent = money(Math.max(0, balance - safeAmount));
+    }
+
+    amountInput.addEventListener("input", renderPaymentPreview);
+    renderPaymentPreview();
+</script>
 </body>
 </html>

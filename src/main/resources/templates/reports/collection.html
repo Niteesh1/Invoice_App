@@ -24,7 +24,7 @@
     <section class="panel">
         <div class="section-header">
             <h2>Total</h2>
-            <strong th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</strong>
+            <strong class="money" th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</strong>
         </div>
         <table>
             <thead>
@@ -39,12 +39,15 @@
             </thead>
             <tbody>
             <tr th:each="payment : ${payments}">
-                <td th:text="${payment.paymentDate}">Date</td>
-                <td th:text="${payment.receiptNumber}">Receipt</td>
-                <td th:text="${payment.bookIssue.student.name}">Student</td>
-                <td th:text="${payment.bookIssue.bookTitle}">Book</td>
-                <td th:text="${payment.paymentMode}">Mode</td>
-                <td class="number" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
+                <td><span class="date-pill" th:text="${payment.paymentDate}">Date</span></td>
+                <td><span class="receipt-chip" th:text="${payment.receiptNumber}">Receipt</span></td>
+                <td>
+                    <span class="student-name" th:text="${payment.bookIssue.student.name}">Student</span>
+                    <span class="class-chip compact" th:text="${payment.bookIssue.student.grade}">Class</span>
+                </td>
+                <td><span class="book-title" th:text="${payment.bookIssue.bookTitle}">Book</span></td>
+                <td><span class="mode-chip" th:text="${payment.paymentMode}">Mode</span></td>
+                <td class="number money amount-collected" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
             </tr>
             <tr th:if="${#lists.isEmpty(payments)}">
                 <td colspan="6" class="empty">No payments for this period.</td>

@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -31,6 +32,26 @@ public class PaymentService {
     @Transactional(readOnly = true)
     public List<Payment> findAll() {
         return paymentRepository.findAllByOrderByPaymentDateDescIdDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Payment> findFiltered(String grade, LocalDate startDate, LocalDate endDate, String sort) {
+        Comparator<Payment> comparator = switch (sort == null ? "" : sort) {
+            case "dateAsc" -> Comparator.comparing(Payment::getPaymentDate).thenComparing(Payment::getId);
+            case "amountDesc" -> Comparator.comparing(Payment::getAmount).reversed();
+            case "amountAsc" -> Comparator.comparing(Payment::getAmount);
+            case "studentAsc" -> Comparator.comparing((Payment payment) -> payment.getBookIssue().getStudent().getName(), String.CASE_INSENSITIVE_ORDER);
+            case "classAsc" -> Comparator.comparing((Payment payment) -> payment.getBookIssue().getStudent().getGrade(), String.CASE_INSENSITIVE_ORDER)
+                    .thenComparing((Payment payment) -> payment.getBookIssue().getStudent().getName(), String.CASE_INSENSITIVE_ORDER);
+            default -> Comparator.comparing(Payment::getPaymentDate).reversed().thenComparing(Comparator.comparing(Payment::getId).reversed());
+        };
+
+        return findAll().stream()
+                .filter(payment -> grade == null || grade.isBlank() || payment.getBookIssue().getStudent().getGrade().equals(grade))
+                .filter(payment -> startDate == null || !payment.getPaymentDate().isBefore(startDate))
+                .filter(payment -> endDate == null || !payment.getPaymentDate().isAfter(endDate))
+                .sorted(comparator)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -91,6 +112,13 @@ public class PaymentService {
     @Transactional(readOnly = true)
     public BigDecimal collectedBetween(LocalDate startDate, LocalDate endDate) {
         return paymentRepository.sumCollectedBetween(startDate, endDate);
+    }
+
+    public BigDecimal totalAmount(List<Payment> payments) {
+        return payments.stream()
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     private String nextReceiptNumber(LocalDate paymentDate) {

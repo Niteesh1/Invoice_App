@@ -15,7 +15,10 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BookIssueService {
@@ -39,6 +42,52 @@ public class BookIssueService {
             return findAll();
         }
         return bookIssueRepository.findByStatusOrderByIssueDateDescIdDesc(status);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookIssue> findFiltered(IssueStatus status, String search, String grade, LocalDate issueDate, String sort) {
+        Comparator<BookIssue> comparator = switch (sort == null ? "" : sort) {
+            case "dateAsc" -> Comparator.comparing(BookIssue::getIssueDate).thenComparing(BookIssue::getId);
+            case "classAsc" -> Comparator.comparing((BookIssue issue) -> issue.getStudent().getGrade(), String.CASE_INSENSITIVE_ORDER)
+                    .thenComparing(issue -> issue.getStudent().getName(), String.CASE_INSENSITIVE_ORDER);
+            case "studentAsc" -> Comparator.comparing((BookIssue issue) -> issue.getStudent().getName(), String.CASE_INSENSITIVE_ORDER);
+            case "balanceDesc" -> Comparator.comparing(BookIssue::getBalance).reversed();
+            case "balanceAsc" -> Comparator.comparing(BookIssue::getBalance);
+            default -> Comparator.comparing(BookIssue::getIssueDate).reversed().thenComparing(Comparator.comparing(BookIssue::getId).reversed());
+        };
+
+        return findByStatus(status).stream()
+                .filter(issue -> matchesSearch(issue, search))
+                .filter(issue -> !StringUtils.hasText(grade) || issue.getStudent().getGrade().equals(grade))
+                .filter(issue -> issueDate == null || issue.getIssueDate().equals(issueDate))
+                .sorted(comparator)
+                .toList();
+    }
+
+    public IssueTotals totals(List<BookIssue> issues) {
+        BigDecimal totalDue = issues.stream()
+                .map(BookIssue::getTotalDue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal collected = issues.stream()
+                .map(BookIssue::getCollectedAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal balance = issues.stream()
+                .map(BookIssue::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return new IssueTotals(issues.size(), money(totalDue), money(collected), money(balance));
+    }
+
+    public List<ClassIssueSummary> classSummaries(List<BookIssue> issues) {
+        Map<String, List<BookIssue>> grouped = new LinkedHashMap<>();
+        issues.forEach(issue -> grouped
+                .computeIfAbsent(issue.getStudent().getGrade(), ignored -> new java.util.ArrayList<>())
+                .add(issue));
+        return grouped.entrySet().stream()
+                .map(entry -> {
+                    IssueTotals totals = totals(entry.getValue());
+                    return new ClassIssueSummary(entry.getKey(), totals.count(), totals.totalDue(), totals.collected(), totals.balance());
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -97,6 +146,15 @@ public class BookIssueService {
         bookIssueRepository.save(issue);
     }
 
+    @Transactional
+    public void deleteIfNoPayments(Long id) {
+        BookIssue issue = getDetailed(id);
+        if (!issue.getPayments().isEmpty()) {
+            throw new BusinessRuleException("Cannot delete a book issue after payment is recorded");
+        }
+        bookIssueRepository.delete(issue);
+    }
+
     public boolean matchesSearch(BookIssue issue, String search) {
         if (!StringUtils.hasText(search)) {
             return true;
@@ -113,5 +171,11 @@ public class BookIssueService {
 
     private String trim(String value) {
         return value == null ? null : value.trim();
+    }
+
+    public record IssueTotals(int count, BigDecimal totalDue, BigDecimal collected, BigDecimal balance) {
+    }
+
+    public record ClassIssueSummary(String className, int count, BigDecimal totalDue, BigDecimal collected, BigDecimal balance) {
     }
 }

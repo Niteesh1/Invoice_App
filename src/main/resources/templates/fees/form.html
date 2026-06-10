@@ -12,7 +12,12 @@
     <div class="page-header">
         <div>
             <h1>New Book Issue</h1>
-            <p>Record book handover even when payment is pending.</p>
+            <p th:if="${preselectedStudent == null}">Record book handover even when payment is pending.</p>
+            <p th:if="${preselectedStudent != null}">
+                <span>Creating issue for </span>
+                <strong th:text="${preselectedStudent.name}">Student</strong>
+                <span class="class-chip compact" th:text="${preselectedStudent.grade}">Class</span>
+            </p>
         </div>
     </div>
     <form th:action="@{/fees}" th:object="${issueForm}" method="post" class="panel form-grid">
@@ -43,12 +48,17 @@
         </label>
         <label>
             Issue Date
-            <input th:field="*{issueDate}" type="date" required>
+            <input id="issueDate" name="issueDate" th:value="${issueForm.issueDate}" type="date" required>
+            <span class="helper-text">Defaults to today. Change only for backdated entries.</span>
             <span class="field-error" th:errors="*{issueDate}"></span>
         </label>
         <label>
             Book Title
-            <input th:field="*{bookTitle}" required>
+            <input th:field="*{bookTitle}" list="bookTitleSuggestions" required>
+            <datalist id="bookTitleSuggestions">
+                <option th:each="title : ${bookTitleSuggestions}" th:value="${title}"></option>
+            </datalist>
+            <span class="helper-text">Use the default when handing over the full related book set.</span>
             <span class="field-error" th:errors="*{bookTitle}"></span>
         </label>
         <label>
@@ -58,14 +68,20 @@
         </label>
         <label>
             Unit Price
-            <input th:field="*{unitPrice}" type="number" min="0" step="0.01" required>
+            <input th:field="*{unitPrice}" id="unitPrice" type="number" min="0" step="0.01" required>
+            <span class="helper-text">Auto-filled from class fee config; edit if needed.</span>
             <span class="field-error" th:errors="*{unitPrice}"></span>
         </label>
         <label>
             Discount
-            <input th:field="*{discount}" type="number" min="0" step="0.01" required>
+            <input th:field="*{discount}" id="discount" type="number" min="0" step="0.01" required>
             <span class="field-error" th:errors="*{discount}"></span>
         </label>
+        <section class="calculation-box span-2" aria-live="polite">
+            <div><span>Subtotal</span><strong class="money" id="subtotalPreview">0.00</strong></div>
+            <div><span>Discount</span><strong class="money" id="discountPreview">0.00</strong></div>
+            <div><span>Total Due</span><strong class="money" id="totalDuePreview">0.00</strong></div>
+        </section>
         <label class="span-2">
             Remarks
             <textarea th:field="*{remarks}" rows="3"></textarea>
@@ -77,13 +93,47 @@
         </div>
     </form>
 </main>
-<script>
+<script th:inline="javascript">
+    const classFees = /*[[${classFeeMap}]]*/ {};
     const classSelect = document.getElementById("classSelect");
     const studentSearch = document.getElementById("studentSearch");
     const studentSelect = document.getElementById("studentSelect");
+    const quantityInput = document.getElementById("quantity");
+    const unitPriceInput = document.getElementById("unitPrice");
+    const discountInput = document.getElementById("discount");
+    const subtotalPreview = document.getElementById("subtotalPreview");
+    const discountPreview = document.getElementById("discountPreview");
+    const totalDuePreview = document.getElementById("totalDuePreview");
     const placeholder = studentSelect.querySelector("option[value='']");
     const allStudentOptions = Array.from(studentSelect.querySelectorAll("option[data-class]"));
     const initialStudentId = studentSelect.value;
+
+    function money(value) {
+        return Number.isFinite(value) ? value.toFixed(2) : "0.00";
+    }
+
+    function numberValue(input) {
+        const value = Number.parseFloat(input.value);
+        return Number.isFinite(value) ? value : 0;
+    }
+
+    function renderTotals() {
+        const quantity = Math.max(1, Number.parseInt(quantityInput.value || "1", 10));
+        const unitPrice = numberValue(unitPriceInput);
+        const discount = numberValue(discountInput);
+        const subtotal = quantity * unitPrice;
+        const totalDue = Math.max(0, subtotal - discount);
+
+        subtotalPreview.textContent = money(subtotal);
+        discountPreview.textContent = money(discount);
+        totalDuePreview.textContent = money(totalDue);
+    }
+
+    function applyClassFeeIfAvailable() {
+        if (classSelect.value && Object.prototype.hasOwnProperty.call(classFees, classSelect.value)) {
+            unitPriceInput.value = money(Number.parseFloat(classFees[classSelect.value]));
+        }
+    }
 
     function renderStudents() {
         const selectedClass = classSelect.value;
@@ -115,10 +165,20 @@
     classSelect.addEventListener("change", () => {
         studentSearch.value = "";
         studentSelect.value = "";
+        applyClassFeeIfAvailable();
         renderStudents();
+        renderTotals();
     });
     studentSearch.addEventListener("input", renderStudents);
+    quantityInput.addEventListener("input", renderTotals);
+    unitPriceInput.addEventListener("input", renderTotals);
+    discountInput.addEventListener("input", renderTotals);
     renderStudents();
+    if (classSelect.value && initialStudentId) {
+        studentSelect.value = initialStudentId;
+    }
+    applyClassFeeIfAvailable();
+    renderTotals();
 </script>
 </body>
 </html>

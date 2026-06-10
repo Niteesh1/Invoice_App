@@ -14,21 +14,30 @@
             <h1 th:text="${issue.bookTitle}">Book</h1>
             <p th:text="${issue.student.name + ' | ' + issue.issueDate}">Student</p>
         </div>
-        <a class="button" th:if="${issue.balance.compareTo(T(java.math.BigDecimal).ZERO) > 0}" th:href="@{/payments/new(issueId=${issue.id})}">Record Payment</a>
+        <div class="actions">
+            <form th:if="${#lists.isEmpty(issue.payments)}"
+                  th:action="@{/fees/{id}/delete(id=${issue.id})}"
+                  method="post"
+                  onsubmit="return confirm('Delete this book issue? This cannot be undone.');">
+                <button class="button danger" type="submit">Delete Issue</button>
+            </form>
+            <a class="button" th:if="${issue.balance.compareTo(T(java.math.BigDecimal).ZERO) > 0}" th:href="@{/payments/new(issueId=${issue.id})}">Record Payment</a>
+        </div>
     </div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
 
     <section class="metrics">
         <div class="metric">
             <span>Total Due</span>
-            <strong th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</strong>
+            <strong class="money" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</strong>
         </div>
         <div class="metric">
             <span>Collected</span>
-            <strong th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</strong>
+            <strong class="money" th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</strong>
         </div>
         <div class="metric">
             <span>Balance</span>
-            <strong th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</strong>
+            <strong class="money" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</strong>
         </div>
         <div class="metric">
             <span>Status</span>
@@ -40,8 +49,8 @@
         <div><span>Student</span><strong th:text="${issue.student.name}">Student</strong></div>
         <div><span>Class</span><strong th:text="${issue.student.grade}">Class</strong></div>
         <div><span>Quantity</span><strong th:text="${issue.quantity}">1</strong></div>
-        <div><span>Unit Price</span><strong th:text="${#numbers.formatDecimal(issue.unitPrice, 1, 2)}">0.00</strong></div>
-        <div><span>Discount</span><strong th:text="${#numbers.formatDecimal(issue.discount, 1, 2)}">0.00</strong></div>
+        <div><span>Unit Price</span><strong class="money" th:text="${#numbers.formatDecimal(issue.unitPrice, 1, 2)}">0.00</strong></div>
+        <div><span>Discount</span><strong class="money" th:text="${#numbers.formatDecimal(issue.discount, 1, 2)}">0.00</strong></div>
         <div><span>Remarks</span><strong th:text="${issue.remarks} ?: '-'">-</strong></div>
     </section>
 
@@ -64,7 +73,7 @@
                 <td th:text="${payment.receiptNumber}">Receipt</td>
                 <td th:text="${payment.paymentMode}">Mode</td>
                 <td th:text="${payment.createdBy}">User</td>
-                <td class="number" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
+                <td class="number money" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</td>
                 <td><a th:href="@{/payments/{id}/receipt(id=${payment.id})}">Receipt</a></td>
             </tr>
             <tr th:if="${#lists.isEmpty(issue.payments)}">

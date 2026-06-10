@@ -1,12 +1,13 @@
 :root {
     color-scheme: light;
-    --bg: #f7f8fa;
+    --bg: #f4f6f8;
     --panel: #ffffff;
-    --ink: #1f2933;
-    --muted: #6b7280;
-    --line: #d7dde5;
-    --accent: #1b6ca8;
-    --accent-dark: #14527f;
+    --ink: #1f2a37;
+    --muted: #667085;
+    --line: #d9e0e8;
+    --accent: #136f63;
+    --accent-dark: #0d554c;
+    --gold: #b7791f;
     --success-bg: #e7f7ef;
     --success-ink: #0f6848;
     --warn-bg: #fff3d8;
@@ -39,19 +40,29 @@ a:hover {
 
 .top-nav {
     align-items: center;
-    background: var(--panel);
+    background: #ffffff;
     border-bottom: 1px solid var(--line);
+    box-shadow: 0 1px 10px rgba(31, 42, 55, 0.06);
     display: flex;
-    gap: 20px;
-    min-height: 60px;
+    gap: 24px;
+    min-height: 68px;
     padding: 0 28px;
 }
 
 .brand {
     color: var(--ink);
-    font-size: 18px;
+    display: grid;
+    font-size: 17px;
     font-weight: 700;
+    line-height: 1.1;
     margin-right: 12px;
+}
+
+.brand small {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 3px;
 }
 
 .nav-links {
@@ -91,7 +102,8 @@ h2 {
 }
 
 h1 {
-    font-size: 30px;
+    font-size: 28px;
+    letter-spacing: 0;
 }
 
 h2 {
@@ -128,6 +140,17 @@ button:hover,
     color: var(--accent);
 }
 
+.button.danger,
+button.danger {
+    background: var(--danger-ink);
+    border-color: var(--danger-ink);
+}
+
+.button.danger:hover,
+button.danger:hover {
+    background: #7f1414;
+}
+
 .link-button {
     background: transparent;
     border: 0;
@@ -144,6 +167,7 @@ button:hover,
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
+    box-shadow: 0 8px 22px rgba(31, 42, 55, 0.05);
 }
 
 .panel {
@@ -160,6 +184,7 @@ button:hover,
 }
 
 .metric {
+    border-top: 3px solid var(--accent);
     padding: 16px;
 }
 
@@ -172,8 +197,19 @@ button:hover,
 
 .metric strong {
     display: block;
-    font-size: 24px;
+    font-size: 26px;
     margin-top: 4px;
+}
+
+.money {
+    font-variant-numeric: tabular-nums;
+}
+
+.money::before {
+    color: var(--muted);
+    content: "Rs. ";
+    font-size: 0.82em;
+    font-weight: 700;
 }
 
 table {
@@ -193,14 +229,114 @@ th {
     color: #4b5563;
     font-size: 13px;
     font-weight: 700;
+    text-transform: uppercase;
 }
 
 tr:last-child td {
     border-bottom: 0;
 }
 
+tbody tr:hover {
+    background: #f8fbfa;
+}
+
 .number {
     text-align: right;
+}
+
+.student-name {
+    color: #162033;
+    display: block;
+    font-weight: 800;
+}
+
+.book-title {
+    color: #334155;
+    display: inline-block;
+    font-weight: 650;
+    max-width: 260px;
+}
+
+.muted-value {
+    color: var(--muted);
+}
+
+.date-pill,
+.class-chip,
+.receipt-chip,
+.mode-chip {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    min-height: 26px;
+    padding: 6px 9px;
+    white-space: nowrap;
+}
+
+.date-pill {
+    background: #eef2f7;
+    color: #475467;
+    font-variant-numeric: tabular-nums;
+}
+
+.class-chip {
+    background: #eaf7f2;
+    color: #126354;
+}
+
+.class-chip.compact {
+    margin-top: 5px;
+}
+
+.receipt-chip {
+    background: #fff7e6;
+    color: #8a5200;
+    font-variant-numeric: tabular-nums;
+}
+
+.mode-chip {
+    background: #eef4ff;
+    color: #315a9f;
+}
+
+.amount-due {
+    color: #5a4a14;
+    font-weight: 800;
+}
+
+.amount-collected {
+    color: #0f6848;
+    font-weight: 850;
+}
+
+.amount-balance {
+    color: #9b1c1c;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.row-action {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--accent);
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 5px 10px;
+    white-space: nowrap;
+}
+
+.row-action:hover {
+    background: #eaf7f2;
+    text-decoration: none;
+}
+
+.compact-actions {
+    justify-content: flex-end;
+    gap: 8px;
 }
 
 .empty {
@@ -304,6 +440,33 @@ label {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.calculation-box {
+    background: #f4f8fb;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 14px;
+}
+
+.calculation-box span {
+    color: var(--muted);
+    display: block;
+    font-size: 13px;
+}
+
+.calculation-box strong {
+    display: block;
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.number-input {
+    margin-left: auto;
+    max-width: 180px;
+}
+
 .report-links {
     display: grid;
     gap: 14px;
@@ -327,6 +490,7 @@ label {
 
 .login-page {
     align-items: center;
+    background: linear-gradient(180deg, #eef6f3 0%, #f8fafc 100%);
     display: flex;
     min-height: 100vh;
     justify-content: center;
@@ -336,6 +500,16 @@ label {
     max-width: 380px;
     padding: 28px;
     width: 100%;
+}
+
+.login-brand {
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+}
+
+.login-brand h1 {
+    font-size: 26px;
 }
 
 .stack {
@@ -350,6 +524,7 @@ label {
 }
 
 .receipt {
+    border-top: 5px solid var(--accent);
     padding: 28px;
 }
 
@@ -364,6 +539,18 @@ label {
 .receipt header {
     border-bottom: 1px solid var(--line);
     padding-bottom: 18px;
+}
+
+.receipt header h1 {
+    font-size: 26px;
+}
+
+.receipt-number {
+    background: #fff7e6;
+    border: 1px solid #f1d39a;
+    border-radius: 6px;
+    color: #7c4a03;
+    padding: 8px 10px;
 }
 
 .receipt dl {
@@ -384,7 +571,7 @@ label {
 }
 
 .receipt-total {
-    background: #eef5fb;
+    background: #eef8f5;
     border-radius: 8px;
     margin: 22px 0;
     padding: 18px;
@@ -405,6 +592,7 @@ label {
     }
 
     .metrics,
+    .calculation-box,
     .report-links,
     .form-grid,
     .detail-grid,
@@ -440,5 +628,6 @@ label {
     .panel,
     .receipt {
         border: 0;
+        box-shadow: none;
     }
 }

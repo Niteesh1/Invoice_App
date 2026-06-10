@@ -1,5 +1,6 @@
 package com.school.fees.controller;
 
+import com.school.fees.config.SchoolClassCatalog;
 import com.school.fees.dto.PaymentForm;
 import com.school.fees.entity.PaymentMode;
 import com.school.fees.exception.BusinessRuleException;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+
 @Controller
 @RequestMapping("/payments")
 public class PaymentController {
@@ -31,8 +34,19 @@ public class PaymentController {
     }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("payments", paymentService.findAll());
+    public String list(@RequestParam(required = false) String grade,
+                       @RequestParam(required = false) LocalDate startDate,
+                       @RequestParam(required = false) LocalDate endDate,
+                       @RequestParam(required = false, defaultValue = "dateDesc") String sort,
+                       Model model) {
+        var payments = paymentService.findFiltered(grade, startDate, endDate, sort);
+        model.addAttribute("payments", payments);
+        model.addAttribute("totalAmount", paymentService.totalAmount(payments));
+        model.addAttribute("classOptions", SchoolClassCatalog.CLASS_OPTIONS);
+        model.addAttribute("selectedGrade", grade);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("selectedSort", sort);
         return "payments/list";
     }
 
@@ -40,6 +54,8 @@ public class PaymentController {
     public String newPayment(@RequestParam Long issueId, Model model) {
         PaymentForm form = new PaymentForm();
         form.setBookIssueId(issueId);
+        form.setPaymentDate(LocalDate.now());
+        form.setAmount(bookIssueService.getDetailed(issueId).getBalance());
         prepareForm(model, form);
         return "payments/form";
     }

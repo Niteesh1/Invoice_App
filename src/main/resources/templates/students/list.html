@@ -18,8 +18,15 @@
     </div>
     <div class="alert success" th:if="${message}" th:text="${message}"></div>
     <form class="toolbar" th:action="@{/students}" method="get">
-        <input type="search" name="search" placeholder="Search name or class" th:value="${search}">
-        <button type="submit">Search</button>
+        <input type="search" name="search" placeholder="Search name or contact" th:value="${search}">
+        <select name="grade">
+            <option value="">All classes</option>
+            <option th:each="className : ${classOptions}"
+                    th:value="${className}"
+                    th:selected="${className == selectedGrade}"
+                    th:text="${className}">Class</option>
+        </select>
+        <button type="submit">Filter</button>
     </form>
     <section class="panel">
         <table>
@@ -34,11 +41,14 @@
             </thead>
             <tbody>
             <tr th:each="student : ${students}">
-                <td th:text="${student.name}">Name</td>
-                <td th:text="${student.grade}">Class</td>
-                <td th:text="${student.contactNumber} ?: '-'">Contact</td>
-                <td th:text="${student.address} ?: '-'">Address</td>
-                <td><a th:href="@{/students/{id}(id=${student.id})}">Open</a></td>
+                <td><span class="student-name" th:text="${student.name}">Name</span></td>
+                <td><span class="class-chip" th:text="${student.grade}">Class</span></td>
+                <td><span class="muted-value" th:text="${student.contactNumber} ?: '-'">Contact</span></td>
+                <td><span class="muted-value" th:text="${student.address} ?: '-'">Address</span></td>
+                <td class="actions compact-actions">
+                    <a class="row-action" th:href="@{/students/{id}(id=${student.id})}">Open</a>
+                    <a class="row-action" th:href="@{/students/{id}/edit(id=${student.id})}">Edit</a>
+                </td>
             </tr>
             <tr th:if="${#lists.isEmpty(students)}">
                 <td colspan="5" class="empty">No students found.</td>

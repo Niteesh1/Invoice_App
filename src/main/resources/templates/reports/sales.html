@@ -36,12 +36,15 @@
             </thead>
             <tbody>
             <tr th:each="issue : ${issues}">
-                <td th:text="${issue.issueDate}">Date</td>
-                <td th:text="${issue.student.name}">Student</td>
-                <td th:text="${issue.bookTitle}">Book</td>
+                <td><span class="date-pill" th:text="${issue.issueDate}">Date</span></td>
+                <td>
+                    <span class="student-name" th:text="${issue.student.name}">Student</span>
+                    <span class="class-chip compact" th:text="${issue.student.grade}">Class</span>
+                </td>
+                <td><span class="book-title" th:text="${issue.bookTitle}">Book</span></td>
                 <td class="number" th:text="${issue.quantity}">1</td>
-                <td class="number" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
-                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td class="number money amount-due" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
+                <td class="number money amount-balance" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
                 <td><span th:class="'badge status-' + ${issue.status}" th:text="${issue.status}">PENDING</span></td>
             </tr>
             <tr th:if="${#lists.isEmpty(issues)}">

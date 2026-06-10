@@ -17,8 +17,17 @@
         <a class="button" th:href="@{/fees/new}">New Book Issue</a>
     </div>
     <div class="alert success" th:if="${message}" th:text="${message}"></div>
+    <div class="alert error" th:if="${error}" th:text="${error}"></div>
     <form class="toolbar" th:action="@{/fees}" method="get">
         <input type="search" name="search" placeholder="Search student, class, or book" th:value="${search}">
+        <select name="grade">
+            <option value="">All classes</option>
+            <option th:each="className : ${classOptions}"
+                    th:value="${className}"
+                    th:selected="${className == selectedGrade}"
+                    th:text="${className}">Class</option>
+        </select>
+        <input type="date" name="issueDate" th:value="${issueDate}">
         <select name="status">
             <option value="">All statuses</option>
             <option th:each="status : ${statuses}"
@@ -26,9 +35,72 @@
                     th:selected="${status == selectedStatus}"
                     th:text="${status}">PENDING</option>
         </select>
+        <select name="sort">
+            <option value="dateDesc" th:selected="${selectedSort == 'dateDesc'}">Newest first</option>
+            <option value="dateAsc" th:selected="${selectedSort == 'dateAsc'}">Oldest first</option>
+            <option value="classAsc" th:selected="${selectedSort == 'classAsc'}">Class then student</option>
+            <option value="studentAsc" th:selected="${selectedSort == 'studentAsc'}">Student A-Z</option>
+            <option value="balanceDesc" th:selected="${selectedSort == 'balanceDesc'}">Balance high to low</option>
+            <option value="balanceAsc" th:selected="${selectedSort == 'balanceAsc'}">Balance low to high</option>
+        </select>
         <button type="submit">Filter</button>
+        <a class="button secondary" th:href="@{/fees}">Clear</a>
     </form>
+
+    <section class="metrics">
+        <div class="metric">
+            <span>Filtered Issues</span>
+            <strong th:text="${listTotals.count()}">0</strong>
+        </div>
+        <div class="metric">
+            <span>Filtered Due</span>
+            <strong class="money amount-due" th:text="${#numbers.formatDecimal(listTotals.totalDue(), 1, 2)}">0.00</strong>
+        </div>
+        <div class="metric">
+            <span>Filtered Collected</span>
+            <strong class="money amount-collected" th:text="${#numbers.formatDecimal(listTotals.collected(), 1, 2)}">0.00</strong>
+        </div>
+        <div class="metric">
+            <span>Filtered Balance</span>
+            <strong class="money amount-balance" th:text="${#numbers.formatDecimal(listTotals.balance(), 1, 2)}">0.00</strong>
+        </div>
+    </section>
+
     <section class="panel">
+        <div class="section-header">
+            <h2 th:text="${'Class-wise Summary - ' + summaryDate}">Class-wise Summary</h2>
+            <strong>
+                <span th:text="${dayTotals.count()}">0</span>
+                <span> issues</span>
+            </strong>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Class</th>
+                <th class="number">Count</th>
+                <th class="number">Due</th>
+                <th class="number">Collected</th>
+                <th class="number">Balance</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="summary : ${classSummaries}">
+                <td><span class="class-chip" th:text="${summary.className()}">Class</span></td>
+                <td class="number" th:text="${summary.count()}">0</td>
+                <td class="number money amount-due" th:text="${#numbers.formatDecimal(summary.totalDue(), 1, 2)}">0.00</td>
+                <td class="number money amount-collected" th:text="${#numbers.formatDecimal(summary.collected(), 1, 2)}">0.00</td>
+                <td class="number money amount-balance" th:text="${#numbers.formatDecimal(summary.balance(), 1, 2)}">0.00</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(classSummaries)}">
+                <td colspan="5" class="empty">No book issues for this day.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <div class="section-header"><h2>Book Issue Results</h2></div>
         <table>
             <thead>
             <tr>
@@ -44,14 +116,17 @@
             </thead>
             <tbody>
             <tr th:each="issue : ${issues}">
-                <td th:text="${issue.issueDate}">Date</td>
-                <td th:text="${issue.student.name}">Student</td>
-                <td th:text="${issue.bookTitle}">Book</td>
-                <td class="number" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
-                <td class="number" th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</td>
-                <td class="number" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
+                <td><span class="date-pill" th:text="${issue.issueDate}">Date</span></td>
+                <td>
+                    <span class="student-name" th:text="${issue.student.name}">Student</span>
+                    <span class="class-chip compact" th:text="${issue.student.grade}">Class</span>
+                </td>
+                <td><span class="book-title" th:text="${issue.bookTitle}">Book</span></td>
+                <td class="number money amount-due" th:text="${#numbers.formatDecimal(issue.totalDue, 1, 2)}">0.00</td>
+                <td class="number money amount-collected" th:text="${#numbers.formatDecimal(issue.collectedAmount, 1, 2)}">0.00</td>
+                <td class="number money amount-balance" th:text="${#numbers.formatDecimal(issue.balance, 1, 2)}">0.00</td>
                 <td><span th:class="'badge status-' + ${issue.status}" th:text="${issue.status}">PENDING</span></td>
-                <td><a th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
+                <td><a class="row-action" th:href="@{/fees/{id}(id=${issue.id})}">Open</a></td>
             </tr>
             <tr th:if="${#lists.isEmpty(issues)}">
                 <td colspan="8" class="empty">No book issues found.</td>

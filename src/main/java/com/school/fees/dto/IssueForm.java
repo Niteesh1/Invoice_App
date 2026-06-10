@@ -22,7 +22,7 @@ public class IssueForm {
 
     @NotBlank
     @Size(max = 160)
-    private String bookTitle;
+    private String bookTitle = "Textbook & Workbook Set";
 
     @Min(1)
     private int quantity = 1;
