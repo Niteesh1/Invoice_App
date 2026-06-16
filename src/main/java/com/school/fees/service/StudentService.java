@@ -2,6 +2,7 @@ package com.school.fees.service;
 
 import com.school.fees.entity.Student;
 import com.school.fees.exception.ResourceNotFoundException;
+import com.school.fees.repository.BookIssueRepository;
 import com.school.fees.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +14,11 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final BookIssueRepository bookIssueRepository;
 
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, BookIssueRepository bookIssueRepository) {
         this.studentRepository = studentRepository;
+        this.bookIssueRepository = bookIssueRepository;
     }
 
     @Transactional(readOnly = true)
@@ -70,6 +73,16 @@ public class StudentService {
         existing.setAddress(updatedStudent.getAddress());
         normalize(existing);
         return studentRepository.save(existing);
+    }
+
+    @Transactional
+    public String deleteEntireRecord(Long id) {
+        Student student = get(id);
+        var issues = bookIssueRepository.findByStudentIdOrderByIssueDateDescIdDesc(id);
+        bookIssueRepository.deleteAll(issues);
+        bookIssueRepository.flush();
+        studentRepository.delete(student);
+        return student.getName();
     }
 
     private void normalize(Student student) {

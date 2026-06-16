@@ -21,7 +21,7 @@
         <label>
             Payment Date
             <input id="paymentDate" name="paymentDate" th:value="${paymentForm.paymentDate}" type="date" required>
-            <span class="helper-text">Defaults to today. Change only if recording an earlier payment.</span>
+            <span class="helper-text">Defaults to the book issue date. Change it when the actual payment date is different.</span>
             <span class="field-error" th:errors="*{paymentDate}"></span>
         </label>
         <label>

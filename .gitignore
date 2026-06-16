@@ -8,6 +8,10 @@ target/
 .settings/
 .env
 docs/
+docs/*
+!docs/DOTNET_BOOK_FEE_DEVOPS_PROJECT_HANDOFF.md
+!docs/BEGINNER_BUILD_DEPLOYMENT_FLOWCHART.md
+!docs/BOOK_FEE_COMPLETE_APPLICATION_FLOW.png
 BOOK_FEE_COLLECTION_REPO_STARTER.md
 sister-laptop-kit/
 scripts/

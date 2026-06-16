@@ -104,4 +104,15 @@ public class StudentController {
         model.addAttribute("payments", paymentService.findForStudent(id));
         return "students/detail";
     }
+
+    @PostMapping("/{id}/delete")
+    public String deleteEntireRecord(@PathVariable Long id,
+                                     RedirectAttributes redirectAttributes) {
+        String studentName = studentService.deleteEntireRecord(id);
+        redirectAttributes.addFlashAttribute(
+                "message",
+                "Deleted " + studentName + " and all related book issues and payments"
+        );
+        return "redirect:/students";
+    }
 }

@@ -52,10 +52,11 @@ public class PaymentController {
 
     @GetMapping("/new")
     public String newPayment(@RequestParam Long issueId, Model model) {
+        var issue = bookIssueService.getDetailed(issueId);
         PaymentForm form = new PaymentForm();
         form.setBookIssueId(issueId);
-        form.setPaymentDate(LocalDate.now());
-        form.setAmount(bookIssueService.getDetailed(issueId).getBalance());
+        form.setPaymentDate(issue.getIssueDate());
+        form.setAmount(issue.getBalance());
         prepareForm(model, form);
         return "payments/form";
     }

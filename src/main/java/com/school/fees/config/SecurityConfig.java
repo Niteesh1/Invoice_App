@@ -3,6 +3,7 @@ package com.school.fees.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +20,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/students/*/delete").hasRole("ADMIN")
                         .requestMatchers("/reports/**").hasRole("ADMIN")
                         .requestMatchers("/book-fee-config/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

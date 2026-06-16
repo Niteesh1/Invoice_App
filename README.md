@@ -50,3 +50,6 @@ The MySQL database is exposed on host port `3308` and persisted in Docker volume
 
 - Runtime and reset steps: `docs/RUNBOOK.md`
 - Original build brief: `BOOK_FEE_COLLECTION_REPO_STARTER.md`
+- Separate .NET rebuild and DevOps project handoff: `docs/DOTNET_BOOK_FEE_DEVOPS_PROJECT_HANDOFF.md`
+- Beginner Java/JAR/Maven/Docker/.NET flowchart: `docs/BEGINNER_BUILD_DEPLOYMENT_FLOWCHART.md`
+- Complete application flow image: `docs/BOOK_FEE_COMPLETE_APPLICATION_FLOW.png`

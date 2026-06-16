@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,6 +22,13 @@
         <div class="actions">
             <a class="button secondary" th:href="@{/students/{id}/edit(id=${student.id})}">Edit Student</a>
             <a class="button" th:href="@{/fees/new(studentId=${student.id})}">New Book Issue</a>
+            <form sec:authorize="hasRole('ADMIN')"
+                  th:action="@{/students/{id}/delete(id=${student.id})}"
+                  method="post"
+                  th:attr="data-student-name=${student.name}"
+                  onsubmit="return confirmEntireStudentDeletion(this);">
+                <button class="button danger" type="submit">Delete Entire Record</button>
+            </form>
         </div>
     </div>
 
@@ -83,5 +92,16 @@
         </table>
     </section>
 </main>
+<script>
+    function confirmEntireStudentDeletion(form) {
+        const studentName = form.dataset.studentName;
+        const enteredName = window.prompt(
+            'This permanently deletes ' + studentName
+            + ' and ALL related book issues, payments, and receipts.\n\n'
+            + 'Type the student name exactly to continue:'
+        );
+        return enteredName === studentName;
+    }
+</script>
 </body>
 </html>
