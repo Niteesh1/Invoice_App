@@ -45,7 +45,7 @@ The MySQL database is exposed on host port `3308` and persisted in Docker volume
 - Generate printable receipts
 - Dashboard for collection and pending status
 - Reports for collection, sales, and pending dues
-
+- Added CI Pipeline to create JAR using Gihub actions
 ## Important Docs
 
 - Runtime and reset steps: `docs/RUNBOOK.md`
