@@ -1,0 +1,10 @@
+.git
+.github
+.codex
+.agents
+target
+docs
+scripts
+sister-laptop-kit
+*.log
+*.tmp
