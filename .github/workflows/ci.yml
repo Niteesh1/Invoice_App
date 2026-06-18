@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   build-test-package:
     runs-on: ubuntu-latest
@@ -21,14 +25,29 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Run tests
-        run: mvn -B test
+      - name: Review dependency changes
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
 
-      - name: Build JAR
-        run: mvn -B package -DskipTests
+      - name: Run quality gates
+        run: mvn -B verify
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
           name: fee-management-jar
           path: target/fee-management-1.0.0.jar
+
+      - name: Upload JaCoCo coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-report
+          path: target/site/jacoco
+
+      - name: Upload Checkstyle report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkstyle-report
+          path: target/checkstyle-*.xml

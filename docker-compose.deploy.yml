@@ -1,0 +1,39 @@
+services:
+  app:
+    image: ghcr.io/niteesh1/invoice_app:${APP_IMAGE_TAG:-latest}
+    container_name: book-fee-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8082
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/book_fee_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-book_fee_user}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-book_fee_pass}
+      APP_ADMIN_USERNAME: ${APP_ADMIN_USERNAME:-admin}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:-admin123}
+      APP_CASHIER_USERNAME: ${APP_CASHIER_USERNAME:-cashier}
+      APP_CASHIER_PASSWORD: ${APP_CASHIER_PASSWORD:-cashier123}
+    ports:
+      - "8082:8082"
+
+  mysql:
+    image: mysql:8.4
+    container_name: book-fee-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: book_fee_db
+      MYSQL_USER: ${MYSQL_USER:-book_fee_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-book_fee_pass}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_pass}
+    volumes:
+      - book_fee_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-root_pass}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  book_fee_mysql_data:
